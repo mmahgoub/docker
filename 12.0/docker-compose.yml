@@ -1,0 +1,33 @@
+version: '3'
+services:
+  web:
+    image: softwex-odoo12:1.0
+    build: .
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+    volumes:
+      - odoo12-web-data:/var/lib/odoo
+      - ./addons:/mnt/extra-addons
+  db:
+    image: postgres:10
+    environment:
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_USER=odoo
+      - POSTGRES_DB=postgres
+    volumes:
+      - ./data:/var/lib/postgresql/data
+      - odoo12-db-data:/var/lib/postgresql/data
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - db
+      - web
+volumes:
+  odoo12-web-data:
+  odoo12-db-data:
